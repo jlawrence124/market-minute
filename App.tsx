@@ -7,8 +7,17 @@ import { Loader } from './components/Loader';
 import { PodcastPlayer } from './components/PodcastPlayer';
 import { SourceList } from './components/SourceList';
 
+const voices = [
+  { name: 'Kore (Male, Calm)', value: 'Kore' },
+  { name: 'Puck (Male, Energetic)', value: 'Puck' },
+  { name: 'Zephyr (Female, Calm)', value: 'Zephyr' },
+  { name: 'Charon (Female, Deep)', value: 'Charon' },
+  { name: 'Fenrir (Male, Deep)', value: 'Fenrir' },
+];
+
 const App: React.FC = () => {
   const [tickers, setTickers] = useState<string>('GOOG,TSLA');
+  const [selectedVoice, setSelectedVoice] = useState<string>('Puck');
   const [loadingStep, setLoadingStep] = useState<LoadingStep>(LoadingStep.IDLE);
   const [error, setError] = useState<string | null>(null);
   const [podcastAudioUrl, setPodcastAudioUrl] = useState<string | null>(null);
@@ -38,7 +47,7 @@ const App: React.FC = () => {
       const script = await generatePodcastScript(aggregatedContent, tickerList);
       
       setLoadingStep(LoadingStep.GENERATING_AUDIO);
-      const base64Audio = await generatePodcastAudio(script);
+      const base64Audio = await generatePodcastAudio(script, selectedVoice);
 
       // Decode audio
       audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
@@ -63,7 +72,7 @@ const App: React.FC = () => {
         audioContext.close();
       }
     }
-  }, [tickers]);
+  }, [tickers, selectedVoice]);
 
   // Helper to create a WAV file buffer from raw PCM data
   const createWavBuffer = (pcmData: Float32Array, sampleRate: number): ArrayBuffer => {
@@ -115,6 +124,24 @@ const App: React.FC = () => {
       </div>
 
       <div className="w-full max-w-2xl mt-8 bg-slate-800/50 backdrop-blur-sm rounded-xl shadow-lg p-6">
+        <div className="mb-4">
+            <label htmlFor="voice-select" className="block text-sm font-medium text-slate-300 mb-2">
+              Podcast Voice
+            </label>
+            <select
+              id="voice-select"
+              value={selectedVoice}
+              onChange={(e) => setSelectedVoice(e.target.value)}
+              disabled={isLoading}
+              className="w-full bg-slate-700 text-white border-2 border-slate-600 rounded-lg px-4 py-3 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 focus:outline-none transition-all duration-200"
+            >
+              {voices.map((voice) => (
+                <option key={voice.value} value={voice.value}>
+                  {voice.name}
+                </option>
+              ))}
+            </select>
+        </div>
         <div className="flex flex-col sm:flex-row gap-4">
           <input
             type="text"
@@ -122,6 +149,7 @@ const App: React.FC = () => {
             onChange={(e) => setTickers(e.target.value)}
             placeholder="e.g., AAPL, NVDA, MSFT"
             disabled={isLoading}
+            aria-label="Security Tickers"
             className="flex-grow bg-slate-700 text-white placeholder-slate-500 border-2 border-slate-600 rounded-lg px-4 py-3 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 focus:outline-none transition-all duration-200"
           />
           <button
