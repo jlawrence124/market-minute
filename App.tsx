@@ -10,13 +10,13 @@ const voices = [
   { name: 'Kore (Male, Calm)', value: 'Kore' },
   { name: 'Puck (Male, Energetic)', value: 'Puck' },
   { name: 'Zephyr (Female, Calm)', value: 'Zephyr' },
-  { name: 'Charon (Female, Deep)', value: 'Charon' },
-  { name: 'Fenrir (Male, Deep)', value: 'Fenrir' },
+  { name: 'Charon (Male, Deep)', value: 'Charon' },
+  { name: 'Fenrir (Male, Energetic)', value: 'Fenrir' },
 ];
 
 const App: React.FC = () => {
   const [tickers, setTickers] = useState<string>('GOOG,TSLA');
-  const [selectedVoice, setSelectedVoice] = useState<string>('Zephyr');
+  const [selectedVoice, setSelectedVoice] = useState<string>('Charon');
   const [loadingStep, setLoadingStep] = useState<LoadingStep>(LoadingStep.IDLE);
   const [error, setError] = useState<string | null>(null);
   const [podcastAudioUrl, setPodcastAudioUrl] = useState<string | null>(null);
