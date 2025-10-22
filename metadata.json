@@ -1,0 +1,5 @@
+{
+  "name": "Security Podcast Generator",
+  "description": "Generates a short, personalized podcast episode based on the latest news, SEC filings, and reports for a given list of securities using AI.",
+  "requestFramePermissions": []
+}
