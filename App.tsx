@@ -1,4 +1,3 @@
-
 import React, { useState, useCallback } from 'react';
 import { fetchSourcesForTickers, generatePodcastScript, generatePodcastAudio } from './services/geminiService';
 import { decode, decodeAudioData } from './utils/audio';
@@ -17,7 +16,7 @@ const voices = [
 
 const App: React.FC = () => {
   const [tickers, setTickers] = useState<string>('GOOG,TSLA');
-  const [selectedVoice, setSelectedVoice] = useState<string>('Puck');
+  const [selectedVoice, setSelectedVoice] = useState<string>('Zephyr');
   const [loadingStep, setLoadingStep] = useState<LoadingStep>(LoadingStep.IDLE);
   const [error, setError] = useState<string | null>(null);
   const [podcastAudioUrl, setPodcastAudioUrl] = useState<string | null>(null);
@@ -33,6 +32,10 @@ const App: React.FC = () => {
     const tickerList = tickers.split(',').map(t => t.trim()).filter(Boolean);
     if (tickerList.length === 0) {
       setError("Please enter at least one security ticker.");
+      return;
+    }
+    if (tickerList.length > 4) {
+      setError("Please enter a maximum of 4 security tickers.");
       return;
     }
     
@@ -112,20 +115,20 @@ const App: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-4 sm:p-6 lg:p-8 font-sans relative">
+    <div className="min-h-screen flex flex-col items-center justify-center p-4 sm:p-6 lg:p-8 relative">
       {isLoading && <Loader message={loadingStep} />}
       <div className="w-full max-w-2xl text-center">
-        <h1 className="text-4xl sm:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-sky-500">
-          Security Podcast Generator
+        <h1 className="text-4xl sm:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-schw-blue to-schw-green">
+          Schwab AI Market Minute
         </h1>
-        <p className="mt-4 text-lg text-slate-400">
+        <p className="mt-4 text-lg text-schw-text-light">
           Enter comma-separated stock tickers to generate a personalized audio briefing on the latest market intelligence.
         </p>
       </div>
 
-      <div className="w-full max-w-2xl mt-8 bg-slate-800/50 backdrop-blur-sm rounded-xl shadow-lg p-6">
+      <div className="w-full max-w-2xl mt-8 bg-white rounded-xl shadow-md border border-schw-gray p-6">
         <div className="mb-4">
-            <label htmlFor="voice-select" className="block text-sm font-medium text-slate-300 mb-2">
+            <label htmlFor="voice-select" className="block text-sm font-medium text-schw-text mb-2">
               Podcast Voice
             </label>
             <select
@@ -133,7 +136,7 @@ const App: React.FC = () => {
               value={selectedVoice}
               onChange={(e) => setSelectedVoice(e.target.value)}
               disabled={isLoading}
-              className="w-full bg-slate-700 text-white border-2 border-slate-600 rounded-lg px-4 py-3 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 focus:outline-none transition-all duration-200"
+              className="w-full bg-white text-schw-text border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-schw-blue focus:border-schw-blue focus:outline-none transition-all duration-200"
             >
               {voices.map((voice) => (
                 <option key={voice.value} value={voice.value}>
@@ -150,25 +153,21 @@ const App: React.FC = () => {
             placeholder="e.g., AAPL, NVDA, MSFT"
             disabled={isLoading}
             aria-label="Security Tickers"
-            className="flex-grow bg-slate-700 text-white placeholder-slate-500 border-2 border-slate-600 rounded-lg px-4 py-3 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 focus:outline-none transition-all duration-200"
+            className="flex-grow bg-white text-schw-text placeholder-gray-400 border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-schw-blue focus:border-schw-blue focus:outline-none transition-all duration-200"
           />
           <button
             onClick={handleGeneratePodcast}
             disabled={isLoading}
-            className="bg-emerald-500 text-slate-900 font-bold px-6 py-3 rounded-lg hover:bg-emerald-400 disabled:bg-slate-600 disabled:cursor-not-allowed transition-all duration-200 shadow-md hover:shadow-lg disabled:shadow-none"
+            className="bg-schw-blue text-white font-bold px-6 py-3 rounded-lg hover:bg-opacity-90 disabled:bg-gray-400 disabled:cursor-not-allowed transition-all duration-200 shadow-sm hover:shadow-md disabled:shadow-none"
           >
             Generate Podcast
           </button>
         </div>
-        {error && <p className="mt-4 text-red-400">{error}</p>}
+        {error && <p className="mt-4 text-red-600">{error}</p>}
       </div>
       
       {podcastAudioUrl && <PodcastPlayer audioUrl={podcastAudioUrl} />}
       {sources.length > 0 && <SourceList sources={sources} />}
-
-      <footer className="absolute bottom-4 text-slate-500 text-sm">
-        Powered by Google Gemini
-      </footer>
     </div>
   );
 };
