@@ -1,3 +1,4 @@
+
 import React, { useState, useCallback } from 'react';
 import { fetchSourcesForTickers, generatePodcastScript, generatePodcastAudio } from './services/geminiService';
 import { decode, decodeAudioData } from './utils/audio';
@@ -5,6 +6,7 @@ import { LoadingStep, Source } from './types';
 import { Loader } from './components/Loader';
 import { PodcastPlayer } from './components/PodcastPlayer';
 import { SourceList } from './components/SourceList';
+import { TranscriptViewer } from './components/TranscriptViewer';
 
 const voices = [
   { name: 'Kore (Male, Calm)', value: 'Kore' },
@@ -12,15 +14,21 @@ const voices = [
   { name: 'Zephyr (Female, Calm)', value: 'Zephyr' },
   { name: 'Charon (Male, Deep)', value: 'Charon' },
   { name: 'Fenrir (Male, Energetic)', value: 'Fenrir' },
+  { name: 'Algieba (Male, Deep)', value: 'Algieba'},
+  { name: 'Rhea (Female, Energetic)', value: 'Rhea'},
+  { name: 'Elara (Female, Deep)', value: 'Elara'},
+  { name: 'Ceres (Female, Calm)', value: 'Ceres'},
+  { name: 'Titan (Male, Calm)', value: 'Titan'}
 ];
 
 const App: React.FC = () => {
   const [tickers, setTickers] = useState<string>('GOOG,TSLA');
-  const [selectedVoice, setSelectedVoice] = useState<string>('Charon');
+  const [selectedVoice, setSelectedVoice] = useState<string>('Algieba');
   const [loadingStep, setLoadingStep] = useState<LoadingStep>(LoadingStep.IDLE);
   const [error, setError] = useState<string | null>(null);
   const [podcastAudioUrl, setPodcastAudioUrl] = useState<string | null>(null);
   const [sources, setSources] = useState<Source[]>([]);
+  const [script, setScript] = useState<string | null>(null);
   
   const isLoading = loadingStep !== LoadingStep.IDLE;
 
@@ -28,6 +36,7 @@ const App: React.FC = () => {
     setError(null);
     setPodcastAudioUrl(null);
     setSources([]);
+    setScript(null);
 
     const tickerList = tickers.split(',').map(t => t.trim()).filter(Boolean);
     if (tickerList.length === 0) {
@@ -47,10 +56,11 @@ const App: React.FC = () => {
       setSources(fetchedSources);
 
       setLoadingStep(LoadingStep.GENERATING_SCRIPT);
-      const script = await generatePodcastScript(aggregatedContent, tickerList);
+      const generatedScript = await generatePodcastScript(aggregatedContent, tickerList);
+      setScript(generatedScript);
       
       setLoadingStep(LoadingStep.GENERATING_AUDIO);
-      const base64Audio = await generatePodcastAudio(script, selectedVoice);
+      const base64Audio = await generatePodcastAudio(generatedScript, selectedVoice);
 
       // Decode audio
       audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
@@ -167,6 +177,7 @@ const App: React.FC = () => {
       </div>
       
       {podcastAudioUrl && <PodcastPlayer audioUrl={podcastAudioUrl} />}
+      {script && <TranscriptViewer script={script} />}
       {sources.length > 0 && <SourceList sources={sources} />}
     </div>
   );
