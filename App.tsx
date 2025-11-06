@@ -18,7 +18,8 @@ const voices = [
   { name: 'Rhea (Female, Energetic)', value: 'Rhea'},
   { name: 'Elara (Female, Deep)', value: 'Elara'},
   { name: 'Ceres (Female, Calm)', value: 'Ceres'},
-  { name: 'Titan (Male, Calm)', value: 'Titan'}
+  { name: 'Titan (Male, Calm)', value: 'Titan'},
+  { name: 'Aoede (Female, Expressive)', value: 'Aoede' }
 ];
 
 const App: React.FC = () => {
@@ -129,7 +130,7 @@ const App: React.FC = () => {
       {isLoading && <Loader message={loadingStep} />}
       <div className="w-full max-w-2xl text-center">
         <h1 className="text-4xl sm:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-schw-blue to-schw-green">
-          Schwab AI Market Minute
+          Schwab Flash Cast
         </h1>
         <p className="mt-4 text-lg text-schw-text-light">
           Enter comma-separated stock tickers to generate a personalized audio briefing on the latest market intelligence.
